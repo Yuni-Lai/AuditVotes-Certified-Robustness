@@ -6,7 +6,7 @@ AuditVotes Certified Robustness Source Code for the paper: "AuditVotes: A Framew
 
 https://github.com/gasteigerjo/ppnp (Node classification)  
 
-### Our Code is adapted from:
+### Our Code is mainly adapted from:
 ```
 @inproceedings{bojchevski_sparsesmoothing_2020,
 title = {Efficient Robustness Certificates for Discrete Data: Sparsity-Aware Randomized Smoothing for Graphs, Images and More},
