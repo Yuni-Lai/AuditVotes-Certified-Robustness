@@ -34,7 +34,7 @@ parser.add_argument('-patience', type=int, default=100, help='patience for early
 parser.add_argument('-max_epochs', type=int, default=3000, help='training epoch')
 parser.add_argument('-lr', type=float, default=1e-3, help='learning rate')
 parser.add_argument('-weight_decay', type=float, default=1e-3, help='weight_decay rate')
-parser.add_argument('-model', type=str, default='APPNP', choices=['GCN','GAT','APPNP'], help='GNN models')
+parser.add_argument('-model', type=str, default='GCN', choices=['GCN','GAT','APPNP'], help='GNN models')
 parser.add_argument('-augmenter', type=str, default='SimAug', choices=['','JacAug','FAEAug','SimAug'], help='augmentations')
 parser.add_argument('-n_hidden', type=int, default=128, help='size of hidden layer')
 parser.add_argument('-p_dropout', type=float, default=0.5, help='dropout rate')
@@ -47,7 +47,7 @@ parser.add_argument('-force_training', action='store_true', default=False,
 parser.add_argument('-certify_mode', type=str, default='WithDetect', choices=['Vanilla', 'WithDetect'])
 parser.add_argument('-filter', type=str, default='Conf',
                     choices=['Conf','Entr','Homo','Prox1','Prox2','JSD','NSP'])
-parser.add_argument('-conf_thre', type=float, default=0.6, help='1-threshold for confidence filter')
+parser.add_argument('-conf_thre', type=float, default=0.5, help='1-threshold for confidence filter')
 parser.add_argument('-etr_thre', type=float, default=1.2, help='threshold for entropy filter')
 parser.add_argument('-homo_thre', type=float, default=0.01, help='1-threshold for homophily filter')
 parser.add_argument('-prox_thre', type=float, default=0.5, help='threshold for prox 1 or 2 filter')
@@ -104,7 +104,7 @@ if args.model=="GCN":
     args.batch_size_eval = 1 # avoid OOM
 
 if args.certify_type == 'r_a':
-    args.conf_thre = 0.8
+    args.conf_thre = 0.8 #1-threshold for confidence filter
 
 args.output_dir = f'./results_{args.dataset}_{args.model}{args.augmenter}/{args.certify_mode}{args.filter}/{args.pf_plus_adj}_{args.pf_plus_att}_{args.pf_minus_adj}_{args.pf_minus_att}_{args.n_samples_eval}/'
 args.model_dir = f'./results_{args.dataset}_{args.model}{args.augmenter}/{args.model}{args.augmenter}_{args.pf_plus_adj}_{args.pf_plus_att}_{args.pf_minus_adj}_{args.pf_minus_att}.pth'
