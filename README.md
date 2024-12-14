@@ -34,10 +34,11 @@ pip install -r ./Environment/dgl.txt
 if report: "ResolvePackageNotFound:xxx", or "No matching distribution found for xxx", just open the .yaml or .txt file and delete that line.
 
 ### Run the AuditVotes
-All the training, smoothing, and certifying processes are in main.py.  
+All the training, smoothing, and certifying processes are in ./NodeClassify_SparseAuditVotes/main.py.  
 For example, to run GCN+SimAug+Conf on the Cora-ML dataset:
 ```bash
-main.py -dataset 'cora_ml' -pf_plus_adj 0.2 -pf_minus_adj 0.6 -certify_type 'r_a' -certify_mode 'WithDetect' -filter 'Conf' -model 'GCN' -augmenter 'SimAug'
+cd ./NodeClassify_SparseAuditVotes
+python main.py -dataset 'cora_ml' -pf_plus_adj 0.2 -pf_minus_adj 0.6 -certify_type 'r_a' -certify_mode 'WithDetect' -filter 'Conf' -model 'GCN' -augmenter 'SimAug'
 ```
 
 
