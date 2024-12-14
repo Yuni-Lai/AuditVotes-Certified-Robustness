@@ -2,11 +2,9 @@
 AuditVotes Certified Robustness Source Code for the paper: "AuditVotes: A Framework Towards More Deployable Certified Robustness for Graph Neural Networks"
 
 
-
 ### Datasets are obtained from:
 
 https://github.com/gasteigerjo/ppnp (Node classification)  
-https://github.com/XiaFire/GNNCERT (Graph classification)
 
 ### Our Code is adapted from:
 ```
@@ -17,17 +15,6 @@ booktitle = {Proceedings of the 37th International Conference on Machine Learnin
 pages = {1003--1013},
 year = {2020},
 url={https://github.com/abojchevski/sparse_smoothing}
-}
-```
-and
-```
-@inproceedings{
-xia2024gnncert,
-title={GNNCert: Deterministic Certification of Graph Neural Networks against Adversarial Perturbations},
-author={zaishuo xia and Han Yang and Binghui Wang and Jinyuan Jia},
-booktitle={The Twelfth International Conference on Learning Representations},
-year={2024},
-url={https://github.com/XiaFire/GNNCERT}
 }
 ```
 
@@ -45,6 +32,13 @@ conda activate /home/xxx/dgl
 pip install -r ./Environment/dgl.txt
 ```
 if report: "ResolvePackageNotFound:xxx", or "No matching distribution found for xxx", just open the .yaml or .txt file and delete that line.
+
+### Run the AuditVotes
+All the training, smoothing, and certifying processes are in main.py.  
+For example, to run GCN+SimAug+Conf on the Cora-ML dataset:
+```bash
+main.py -dataset 'cora_ml' -pf_plus_adj 0.2 -pf_minus_adj 0.6 -certify_type 'r_a' -certify_mode 'WithDetect' -filter 'Conf' -model 'GCN' -augmenter 'SimAug'
+```
 
 
 
