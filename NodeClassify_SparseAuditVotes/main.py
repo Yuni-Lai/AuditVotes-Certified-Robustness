@@ -25,7 +25,7 @@ from utils import *
 warnings.filterwarnings("ignore")
 pp = pprint.PrettyPrinter(depth=4)
 # Model Settings=======================================
-parser = argparse.ArgumentParser(description='certify SparseSmooth with adversarial filters')
+parser = argparse.ArgumentParser(description='AuditVotes')
 parser.add_argument('-device', type=str, default='gpu', help="device type")
 parser.add_argument('-gpuID', type=int, default=7)
 parser.add_argument('-seed', type=int, default=2021)
@@ -35,7 +35,7 @@ parser.add_argument('-max_epochs', type=int, default=3000, help='training epoch'
 parser.add_argument('-lr', type=float, default=1e-3, help='learning rate')
 parser.add_argument('-weight_decay', type=float, default=1e-3, help='weight_decay rate')
 parser.add_argument('-model', type=str, default='GCN', choices=['GCN','GAT','APPNP'], help='GNN models')
-parser.add_argument('-augmenter', type=str, default='SimAug', choices=['','JacAug','FAEAug','SimAug'], help='augmentations')
+parser.add_argument('-augmenter', type=str, default='', choices=['','JacAug','FAEAug','SimAug'], help='augmentations')
 parser.add_argument('-n_hidden', type=int, default=128, help='size of hidden layer')
 parser.add_argument('-p_dropout', type=float, default=0.5, help='dropout rate')
 parser.add_argument('-n_per_class', type=int, default=50, help='sample numebr per class')
@@ -44,9 +44,9 @@ parser.add_argument('-batch_size_train', type=int, default=1, help="for smooth l
 parser.add_argument('-force_training', action='store_true', default=False,
                     help="force training even if pretrained model exist")
 # filter setting---------------------
-parser.add_argument('-certify_mode', type=str, default='WithDetect', choices=['Vanilla', 'WithDetect'])
+parser.add_argument('-certify_mode', type=str, default='Vanilla', choices=['Vanilla', 'WithDetect'],help='use conditional smoothing or not')
 parser.add_argument('-filter', type=str, default='Conf',
-                    choices=['Conf','Entr','Homo','Prox1','Prox2','JSD','NSP'])
+                    choices=['Conf','Entr','Homo','Prox1','Prox2','JSD','NSP'],help='condiction filtering function')
 parser.add_argument('-conf_thre', type=float, default=0.5, help='1-threshold for confidence filter')
 parser.add_argument('-etr_thre', type=float, default=1.2, help='threshold for entropy filter')
 parser.add_argument('-homo_thre', type=float, default=0.01, help='1-threshold for homophily filter')
@@ -57,7 +57,7 @@ parser.add_argument('-batch_size_detect', type=int, default=10, help='batch size
 parser.add_argument('-batch_number', type=int, default=800, help='number of batchs')
 # Certify setting----------------------
 parser.add_argument('-pf_plus_adj', type=float, default=0.2, help='probability of adding edges')
-parser.add_argument('-pf_minus_adj', type=float, default=0.6, help='probability of deleting edges')
+parser.add_argument('-pf_minus_adj', type=float, default=0.0, help='probability of deleting edges')
 parser.add_argument('-pf_plus_att', type=float, default=0.0, help='probability of adding attributes')
 parser.add_argument('-pf_minus_att', type=float, default=0.0, help='probability of deleting attributes')
 parser.add_argument('-certify_type', type=str, default='r_a', choices=['r_a', 'r_d'], help='certify delete or add manipulation')
@@ -70,7 +70,7 @@ parser.add_argument('-analyze_result', action='store_true', default=True)
 parser.add_argument('-force_cert', action='store_true', default=True,
                     help="force certifying even if randomized result exist")
 # Dir setting--------------------------
-parser.add_argument('-dataset', type=str, default='citeseer', choices=['cora_ml', 'citeseer', 'pubmed'])
+parser.add_argument('-dataset', type=str, default='cora_ml', choices=['cora_ml', 'citeseer', 'pubmed'])
 parser.add_argument('-output_dir', type=str, default='')
 args = parser.parse_args()
 # Others-------------------------------
