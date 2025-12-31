@@ -1,4 +1,4 @@
-# CertifiyWithDetector
+# AuditVotes to GNNCert
 AuditVotes apply to GNNCert, enhancing certified robustness with augmentation
 
 ### ataset obtained from:
