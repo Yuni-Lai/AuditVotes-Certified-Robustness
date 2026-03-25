@@ -263,4 +263,7 @@ elif args.model in ["GCNJaccard_Aug","GAugGCN","FAugGCN","SAugGCN"]:
     elif args.model=="SAugGCN":
         types = ['GCN', 'GCNJaccard_Aug', "FAugGCN", "SAugGCN"]#
     df_combine, _ = get_combine_df(args, types)
+    type_map = {'GCN': 'GNNCert', 'GCN+JacAug': 'AuditVotes(Jac)', 'GCN+FAEAug': 'AuditVotes(FAE)',
+                'GCN+SimAug': 'AuditVotes(Sim)'}
+    df_combine = df_combine.replace(type_map)
     merged_certified_curve(df_combine, args.output_dir, args)

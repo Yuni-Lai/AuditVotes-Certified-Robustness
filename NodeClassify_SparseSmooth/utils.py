@@ -52,6 +52,8 @@ def model_setup(d,nc,features,idx,edge_proportion,args):
     elif args.model.lower() == 'appnp':
         nc_model = APPNPNet(n_features=d, n_classes=nc, n_hidden=args.n_hidden,
                          k_hops=10, alpha=0.15, p_dropout=args.p_dropout).to(args.device)
+    elif args.model.lower() == 'h2gcn':
+        nc_model = H2GCN(n_features=d, n_classes=nc, n_hidden=args.n_hidden, dropout=args.p_dropout).to(args.device)
     else:
         raise ValueError(f"Model {args.model} not implemented.")
 

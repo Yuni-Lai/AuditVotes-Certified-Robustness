@@ -1,7 +1,7 @@
 from typing import List, Union
 import torch
 import numpy as np
-from sparse_auditvotes.sparsegraph import SparseGraph
+from sparse_auditvotes.sparsegraph import SparseGraph, create_subgraph
 from torch_sparse import coalesce
 from torch_geometric.data import Data, Batch
 from torchvision import datasets, transforms
@@ -27,8 +27,13 @@ def load_and_standardize(file_name):
         if 'type' in loader:
             del loader['type']
         graph = SparseGraph.from_flat_dict(loader)
-
-    graph.standardize(no_self_loops=False)
+        if file_name.endswith('tfinance.npz'):
+            # subgraph
+            label_one_nodes = np.where(graph.labels == 1)[0]
+            nodes_to_keep=np.union1d(range(4000), label_one_nodes)
+            graph = create_subgraph(graph,nodes_to_keep=nodes_to_keep)
+    if not file_name.endswith('simml.npz'):#too little nodes
+        graph.standardize(no_self_loops=False)
 
     # binarize
     graph._flag_writeable(True)
@@ -111,7 +116,7 @@ def split_inductive(labels, n_per_class=20, seed=None, balance_test=True, test_r
     if balance_test:
         # compute n_per_class
         bins = np.bincount(labels)
-        n_test_per_class = np.ceil(test_ratio * bins)
+        n_test_per_class = np.ceil(test_ratio * bins)#np.array([25,  25])#
     else:
         n_test_per_class = np.ones(nc) * n_per_class
 

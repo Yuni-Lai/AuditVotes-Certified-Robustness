@@ -27,24 +27,24 @@ pp = pprint.PrettyPrinter(depth=4)
 # Model Settings=======================================
 parser = argparse.ArgumentParser(description='AuditVotes')
 parser.add_argument('-device', type=str, default='gpu', help="device type")
-parser.add_argument('-gpuID', type=int, default=7)
+parser.add_argument('-gpuID', type=int, default=3)
 parser.add_argument('-seed', type=int, default=2021)
 parser.add_argument('-early_stopping', action='store_true', default=True)
 parser.add_argument('-patience', type=int, default=100, help='patience for early stopping')
 parser.add_argument('-max_epochs', type=int, default=3000, help='training epoch')
 parser.add_argument('-lr', type=float, default=1e-3, help='learning rate')
 parser.add_argument('-weight_decay', type=float, default=1e-3, help='weight_decay rate')
-parser.add_argument('-model', type=str, default='APPNP', choices=['GCN','GAT','APPNP'], help='GNN models')
-parser.add_argument('-augmenter', type=str, default='SimAug', choices=['','JacAug','FAEAug','SimAug'], help='augmentations')
+parser.add_argument('-model', type=str, default='GCN', choices=['GCN','GAT','APPNP','H2GCN'], help='GNN models')
+parser.add_argument('-augmenter', type=str, default='FAEAug', choices=['','JacAug','FAEAug','SimAug'], help='augmentations')
 parser.add_argument('-n_hidden', type=int, default=128, help='size of hidden layer')
 parser.add_argument('-p_dropout', type=float, default=0.5, help='dropout rate')
 parser.add_argument('-n_per_class', type=int, default=50, help='sample numebr per class')
 parser.add_argument('-batch_size_eval', type=int, default=5)  # 5,10,50,100
 parser.add_argument('-batch_size_train', type=int, default=1, help="for smooth logit training")
-parser.add_argument('-force_training', action='store_true', default=False,
+parser.add_argument('-force_training', action='store_true', default=True,
                     help="force training even if pretrained model exist")
 # filter setting---------------------
-parser.add_argument('-certify_mode', type=str, default='WithDetect', choices=['Vanilla', 'WithDetect'],help='use conditional smoothing or not')
+parser.add_argument('-certify_mode', type=str, default='Vanilla', choices=['Vanilla', 'WithDetect'],help='use conditional smoothing or not')
 parser.add_argument('-filter', type=str, default='Conf',
                     choices=['Conf','Entr','Homo','Prox1','Prox2','JSD','NSP'],help='condiction filtering function')
 parser.add_argument('-conf_thre', type=float, default=0.5, help='1-threshold for confidence filter')
@@ -70,7 +70,7 @@ parser.add_argument('-analyze_result', action='store_true', default=False)
 parser.add_argument('-force_cert', action='store_true', default=True,
                     help="force certifying even if randomized result exist")
 # Dir setting--------------------------
-parser.add_argument('-dataset', type=str, default='cora_ml', choices=['cora_ml', 'citeseer', 'pubmed'])
+parser.add_argument('-dataset', type=str, default='tfinance', choices=['cora_ml', 'citeseer', 'pubmed','actor','tfinance','simml'])
 parser.add_argument('-output_dir', type=str, default='')
 args = parser.parse_args()
 # Others-------------------------------
@@ -99,8 +99,17 @@ elif args.dataset == "pubmed":
     args.batch_size_detect=1
     args.batch_size_eval=1
     test_ratio = 0.6
+elif args.dataset == "actor":
+    args.data_dir = "../Data/actor/actor.npz"
+    test_ratio = 0.2
+elif args.dataset == "tfinance":
+    args.data_dir = "../Data/tfinance/tfinance.npz"
+    test_ratio = 0.2
+elif args.dataset == "simml":
+    args.data_dir = "../Data/simml/simml.npz"
+    test_ratio = 0.2
 
-if args.model=="GCN":
+if args.model in ["GCN", "H2GCN"]:
     args.batch_size_eval = 1 # avoid OOM
 
 if args.certify_type == 'r_a':
@@ -132,23 +141,27 @@ idx = {}
 edge_idx = torch.LongTensor(np.stack(graph.adj_matrix.nonzero())).to(args.device)
 attr_idx = torch.LongTensor(np.stack(graph.attr_matrix.nonzero())).to(args.device)
 labels = torch.LongTensor(graph.labels).to(args.device)
+if args.dataset == "actor":
+    attr_matrix = sp.csr_matrix(graph.attr_matrix).astype(np.float32)
+else:
+    attr_matrix = graph.attr_matrix
 
 edge_proportion=graph.adj_matrix.sum()/n**2
 ## prepare inductive subgraphs------------
 idx['train'], idx['unlabeled'], idx['val'], idx['test'] = split_inductive(graph.labels, n_per_class=args.n_per_class,
                                                                           balance_test=True,test_ratio=test_ratio, seed=args.seed)
 # 1) when training, the subgraph is consist of labeled training nodes, and unlabeled training nodes
-attr_idx_train, edge_idx_train, labels_train, mapping_proj_train = filter_data_for_idx(graph.attr_matrix, graph.adj_matrix, args.device,
+attr_idx_train, edge_idx_train, labels_train, mapping_proj_train = filter_data_for_idx(attr_matrix, graph.adj_matrix, args.device,
                                                                     labels, np.concatenate([idx['train'], idx['unlabeled']]))
 idx_train_train = mapping_proj_train[idx['train']].to(args.device)  # idx of training nodes in training graph
 # 2) when validatition, the subgraph is consist of labeled training nodes, labeled validation nodes, and unlabeled training nodes
-attr_idx_val, edge_idx_val, labels_val, mapping_proj_val = filter_data_for_idx(graph.attr_matrix, graph.adj_matrix, args.device,labels,
+attr_idx_val, edge_idx_val, labels_val, mapping_proj_val = filter_data_for_idx(attr_matrix, graph.adj_matrix, args.device,labels,
                                                             np.concatenate([idx['train'], idx['val'], idx['unlabeled']]))
 idx_val_val = mapping_proj_val[idx['val']].to(args.device)  # idx of val nodes in val graph
 # 3) when testing, the input is the whole graph, but test on testing nodes.
 
 ## Load models------------------------------------------
-model = model_setup(d, nc, graph.attr_matrix.todense(),idx, edge_proportion,args)
+model = model_setup(d, nc, attr_matrix.todense(),idx, edge_proportion,args)
 
 
 ## Training the model with smoothing perturbation samples
@@ -169,7 +182,7 @@ if not os.path.exists(args.model_dir) or args.force_training:
                                   n=n,d=d, nc=nc, edge_idx_val=edge_idx_val, attr_idx_val=attr_idx_val, labels_val=labels_val,
                                   idx_train=idx_train_train, idx_val=idx_val_val,edge_idx=edge_idx,attr_idx=attr_idx,idx=idx, lr=args.lr, weight_decay=args.weight_decay,
                                   patience=args.patience*2, max_epochs=args.max_epochs,
-                                  pretrain_ep=0,pretrain_nc=0,
+                                  pretrain_ep=0,pretrain_nc=100,
                                   display_step=50,sample_config=sample_config_train,
                                   batch_size=args.batch_size_train, early_stopping=args.early_stopping)
         with open(f'{args.model_dir.split(".pth")[0]}_best_hyperparams.json', 'w') as f:
@@ -220,8 +233,8 @@ else:
 # print(homophilys_ori.mean(), homophilys.mean())
 
 # model = torch.nn.DataParallel(model, device_ids=[5, 6, 7])
-if not os.path.exists(f'{args.output_dir}/certify_result_{args.certify_type}.pkl') or args.force_cert:
-# if not os.path.exists(f'{args.output_dir}/smoothing_result.pkl') or args.force_cert:
+# if not os.path.exists(f'{args.output_dir}/certify_result_{args.certify_type}.pkl') or args.force_cert:
+if not os.path.exists(f'{args.output_dir}/smoothing_result.pkl') or args.force_cert:
     votes, analysis_data = predict_smooth_gnn(args=args, attr_idx=attr_idx, edge_idx=edge_idx,
                                               sample_config=sample_config_eval,
                                               model=model, n=n, d=d, nc=nc,

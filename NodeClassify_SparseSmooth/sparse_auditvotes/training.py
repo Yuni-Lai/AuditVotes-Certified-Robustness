@@ -126,7 +126,7 @@ def pretrain_ep_net(model, edge_idx, pos_edge_idx,neg_edge_idx, attr_idx, n,d, s
     if n < 3000:
         pos_val = sample_positive_edges_test(edge_idx, pos_edge_idx, sample_ratio=1.0)
     else:
-        pos_val = sample_positive_edges_test(edge_idx, pos_edge_idx, sample_ratio=0.1)
+        pos_val = sample_positive_edges_test(edge_idx, pos_edge_idx, sample_ratio=0.0001)#0.1 default, dense graph:0.001
     neg_val = sample_negative_edges(edge_idx, n, num_samples=pos_val.shape[1]*10)
     best_auc = 0
     model.train()
@@ -289,7 +289,7 @@ def train_Aug_gnn(model, edge_idx_train, attr_idx_train, labels_train,
     if n_train < 3000:
         pos_edge_idx = sample_positive_edges(edge_idx_train, sample_ratio = 0.9)
     else:
-        pos_edge_idx = sample_positive_edges(edge_idx_train, sample_ratio = 0.1)
+        pos_edge_idx = sample_positive_edges(edge_idx_train, sample_ratio = 0.1)#0.1 default, dense graph:0.0001
     # neg_edge_idx = sample_negative_edges(edge_idx_train, n_train, num_samples=pos_edge_idx.shape[1]*10)
     neg_edge_idx = None# it will be sampled randomly in the loss function
     if pretrain_ep:# pretrain augmentor

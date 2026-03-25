@@ -34,7 +34,7 @@ font = {'family': 'serif',
         'size': 5}
 
 #-----string mapping----
-name_map = {'cora_ml': 'Cora-ML', 'citeseer': 'Citeseer','pubmed':'PubMed'}
+name_map = {'cora_ml': 'Cora-ML', 'citeseer': 'Citeseer','pubmed':'PubMed','actor':'Actor','tfinance':'T-Finance','simml':'SimML'}
 interval_map={'cora_ml':[0.70,0.80],'citeseer':[0.65,0.75]}
 
 def filter_map(filter):
