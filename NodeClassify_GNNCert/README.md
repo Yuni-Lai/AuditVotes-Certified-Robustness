@@ -1,7 +1,7 @@
 # AuditVotes to GNNCert
 AuditVotes apply to GNNCert, enhancing certified robustness with augmentation
 
-### ataset obtained from:
+### Dataset obtained from:
 https://github.com/gasteigerjo/ppnp
 
 ### Code adapted from:
@@ -17,12 +17,28 @@ url={https://github.com/XiaFire/GNNCERT}
 ```
 
 ### Usage
+Baseline GNNCert: 
+
+```python
+python main.py --dataset 'cora_ml' --model 'GCN' --certify_mode 'Vanilla' --Ts 20
+```
 Applying AuditVotes(SimAug) to GNNCert: 
 
 ```python
 python main.py --dataset 'cora_ml' --model 'SAugGCN' --certify_mode 'Vanilla' --Ts 20
 ```
 
+Applying AuditVotes(FAEAug) to GNNCert: 
+
+```python
+python main.py --dataset 'cora_ml' --model 'FAugGCN' --certify_mode 'Vanilla' --Ts 20
+```
+
+Applying AuditVotes(JacAug) to GNNCert: 
+
+```python
+python main.py --dataset 'cora_ml' --model 'GCNJaccard_Aug' --certify_mode 'Vanilla' --Ts 20
+```
 
 
 

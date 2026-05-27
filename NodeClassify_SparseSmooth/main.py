@@ -27,7 +27,7 @@ pp = pprint.PrettyPrinter(depth=4)
 # Model Settings=======================================
 parser = argparse.ArgumentParser(description='AuditVotes')
 parser.add_argument('-device', type=str, default='gpu', help="device type")
-parser.add_argument('-gpuID', type=int, default=3)
+parser.add_argument('-gpuID', type=int, default=0)
 parser.add_argument('-seed', type=int, default=2021)
 parser.add_argument('-early_stopping', action='store_true', default=True)
 parser.add_argument('-patience', type=int, default=100, help='patience for early stopping')
@@ -44,7 +44,7 @@ parser.add_argument('-batch_size_train', type=int, default=1, help="for smooth l
 parser.add_argument('-force_training', action='store_true', default=True,
                     help="force training even if pretrained model exist")
 # filter setting---------------------
-parser.add_argument('-certify_mode', type=str, default='Vanilla', choices=['Vanilla', 'WithDetect'],help='use conditional smoothing or not')
+parser.add_argument('-certify_mode', type=str, default='Vanilla', choices=['Vanilla', 'WithDetect'],help='use conditional smoothing (Conf) or not')
 parser.add_argument('-filter', type=str, default='Conf',
                     choices=['Conf','Entr','Homo','Prox1','Prox2','JSD','NSP'],help='condiction filtering function')
 parser.add_argument('-conf_thre', type=float, default=0.5, help='1-threshold for confidence filter')
@@ -70,7 +70,7 @@ parser.add_argument('-analyze_result', action='store_true', default=False)
 parser.add_argument('-force_cert', action='store_true', default=True,
                     help="force certifying even if randomized result exist")
 # Dir setting--------------------------
-parser.add_argument('-dataset', type=str, default='tfinance', choices=['cora_ml', 'citeseer', 'pubmed','actor','tfinance','simml'])
+parser.add_argument('-dataset', type=str, default='cora_ml', choices=['cora_ml', 'citeseer', 'pubmed','actor','tfinance','simml'])
 parser.add_argument('-output_dir', type=str, default='')
 args = parser.parse_args()
 # Others-------------------------------
@@ -172,7 +172,7 @@ if not os.path.exists(args.model_dir) or args.force_training:
                                   n=n,d=d, nc=nc, edge_idx_val=edge_idx_val, attr_idx_val=attr_idx_val, labels_val=labels_val,
                                   idx_train=idx_train_train, idx_val=idx_val_val,edge_idx=edge_idx,attr_idx=attr_idx,idx=idx, lr=args.lr, weight_decay=args.weight_decay,
                                   patience=args.patience*2, max_epochs=args.max_epochs,
-                                  pretrain_ep=250,pretrain_nc=100,#100
+                                  pretrain_ep=250,pretrain_nc=100,
                                   display_step=50,sample_config=sample_config_train,
                                   batch_size=args.batch_size_train, early_stopping=args.early_stopping)
         with open(f'{args.model_dir.split(".pth")[0]}_best_hyperparams.json', 'w') as f:
@@ -182,7 +182,7 @@ if not os.path.exists(args.model_dir) or args.force_training:
                                   n=n,d=d, nc=nc, edge_idx_val=edge_idx_val, attr_idx_val=attr_idx_val, labels_val=labels_val,
                                   idx_train=idx_train_train, idx_val=idx_val_val,edge_idx=edge_idx,attr_idx=attr_idx,idx=idx, lr=args.lr, weight_decay=args.weight_decay,
                                   patience=args.patience*2, max_epochs=args.max_epochs,
-                                  pretrain_ep=0,pretrain_nc=100,
+                                  pretrain_ep=0,pretrain_nc=0,
                                   display_step=50,sample_config=sample_config_train,
                                   batch_size=args.batch_size_train, early_stopping=args.early_stopping)
         with open(f'{args.model_dir.split(".pth")[0]}_best_hyperparams.json', 'w') as f:
