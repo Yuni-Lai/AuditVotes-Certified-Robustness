@@ -27,27 +27,27 @@ if report: "ResolvePackageNotFound:xxx", or "No matching distribution found for 
 ### Run the AuditVotes
 All the training, smoothing, and certifying processes are included in ./NodeClassify_SparseSmooth/main.py.  
 
-For example, to reproduce the results of Table 3:
+For example, to reproduce the results of Table 3 (certify $r_d$ with $p_+=0.0$ and $p_-=0.8$):
 
 Baseline SparseSmooth on the Citeseer dataset:
 ```bash
 cd ./NodeClassify_SparseSmooth
-python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_a' -certify_mode 'Vanilla' -model 'GCN' -augmenter ''
+python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_d' -certify_mode 'Vanilla' -model 'GCN' -augmenter ''
 ```
 Apply AuditVotes(SimAug) to SparseSmooth on the Citeseer dataset:
 ```bash
 cd ./NodeClassify_SparseSmooth
-python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_a' -certify_mode 'Vanilla' -model 'GCN' -augmenter 'SimAug'
+python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_d' -certify_mode 'Vanilla' -model 'GCN' -augmenter 'SimAug'
 ```
 Apply AuditVotes(SimAug+Conf) to SparseSmooth on the Citeseer dataset:
 ```bash
 cd ./NodeClassify_SparseSmooth
-python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_a' -certify_mode 'WithDetect' -filter 'Conf' -model 'GCN' -augmenter 'SimAug'
+python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_d' -certify_mode 'WithDetect' -filter 'Conf' -model 'GCN' -augmenter 'SimAug'
 ```
 Apply AuditVotes(FAEAug+Conf) to SparseSmooth on the Citeseer dataset:
 ```bash
 cd ./NodeClassify_SparseSmooth
-python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_a' -certify_mode 'WithDetect' -filter 'Conf' -model 'GCN' -augmenter 'FAEAug'
+python main.py -dataset 'citeseer' -pf_plus_adj 0.0 -pf_minus_adj 0.8 -certify_type 'r_d' -certify_mode 'WithDetect' -filter 'Conf' -model 'GCN' -augmenter 'FAEAug'
 ```
 Apply AuditVotes(JacAug+Conf) to SparseSmooth on the Citeseer dataset:
 ```bash
