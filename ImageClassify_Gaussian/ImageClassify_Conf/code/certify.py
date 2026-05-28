@@ -6,7 +6,7 @@ import pandas as pd
 
 # import setGPU
 from datasets import get_dataset, DATASETS, get_num_classes
-from core_1 import Smooth
+from core import Smooth
 from time import time
 import torch
 import datetime
