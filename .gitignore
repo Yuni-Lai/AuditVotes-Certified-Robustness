@@ -1,1 +1,13 @@
 /ImageClassify
+
+# macOS junk
+.DS_Store
+**/.DS_Store
+._*
+**/._*
+/NodeClassify_SparseSmooth/__pycache__
+*.json
+*.pth
+*.pdf
+*.pkl
+*.pyc

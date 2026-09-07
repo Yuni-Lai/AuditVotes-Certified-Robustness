@@ -113,7 +113,7 @@ if args.model in ["GCN", "H2GCN"]:
     args.batch_size_eval = 1 # avoid OOM
 
 if args.certify_type == 'r_a':
-    args.conf_thre = 0.75 #1-threshold for confidence filter
+    args.conf_thre = 0.80 #1-threshold for confidence filter
 
 args.output_dir = f'./results_{args.dataset}_{args.model}{args.augmenter}/{args.certify_mode}{args.filter}/{args.pf_plus_adj}_{args.pf_plus_att}_{args.pf_minus_adj}_{args.pf_minus_att}_{args.n_samples_eval}/'
 args.model_dir = f'./results_{args.dataset}_{args.model}{args.augmenter}/{args.model}{args.augmenter}_{args.pf_plus_adj}_{args.pf_plus_att}_{args.pf_minus_adj}_{args.pf_minus_att}.pth'
